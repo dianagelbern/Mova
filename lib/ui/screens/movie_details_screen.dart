@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mova/models/Credits.dart';
 import 'package:mova/models/Movie.dart';
 import 'package:mova/models/PopularMovie.dart';
+import 'package:mova/services/bloc/credits/credits_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 import 'package:mova/services/repositories/movie_repository_impl.dart';
 import 'package:mova/ui/styles.dart';
@@ -27,15 +30,39 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     movie_repository = MovieRepositoryImpl();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        return MovieItemBloc(movie_repository)
-          ..add(MovieItemFetchEvent(widget.id));
-      },
-      child: _createMovieView(context),
-    );
+    return MultiBlocProvider(providers: [
+      BlocProvider(
+        create: (context) {
+          return MovieItemBloc(movie_repository)
+            ..add(MovieItemFetchEvent(widget.id));
+        },
+      ),
+      BlocProvider(
+        create: (context) {
+          return CreditsBloc(movie_repository)
+            ..add(CreditsItemFetchEvent(widget.id));
+        },
+      )
+    ], child: Scaffold(body: SingleChildScrollView(child: Column(children: [_createMovieView(context), _createCastView(context)],),),));
+  }
+
+  Widget _createCastView (BuildContext context){
+    return BlocBuilder<CreditsBloc, CreditsState>(builder: (context, state){
+      if(state is CreditsInitial){
+        return const Center(
+          child: CircularProgressIndicator.adaptive(),
+        );
+      }else if (state is CreditsItemFetchedError){
+        return Text('Fail to load');
+      }else if (state is CreditsItemFetchedState){
+        return listCast(context, state.castList);
+      }else{
+        return Text('Not support');
+      }
+    });
   }
 
   Widget _createMovieView(BuildContext context) {
@@ -48,15 +75,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       } else if (state is MovieItemFetchError) {
         return Text('Fail to load');
       } else if (state is MovieItemfetchedState) {
-        return Scaffold(
-          body: SingleChildScrollView(
-              child: Column(
+        return Column(
             children: [
               header(context, state.movie),
               body(context, state.movie)
             ],
-          )),
-        );
+          );
       } else {
         return Text('Not support');
       }
@@ -70,7 +94,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
           height: 380,
           width: MediaQuery.of(context).size.width,
           child: Image.network(
-            'https://image.tmdb.org/t/p/original' + movie.posterPath!,
+            'https://image.tmdb.org/t/p/original${movie.posterPath!}',
             fit: BoxFit.fitWidth,
             alignment: Alignment.topCenter,
           ),
@@ -125,7 +149,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       size: 25,
                     ),
                     Text(
-                      movie.releaseDate!,
+                      movie.genres.elementAt(0).name,
                       style: Styles.textSubtitle,
                     ),
                   ],
@@ -153,27 +177,45 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
             movie.overview!,
             style: Styles.textSubtitle,
           ),
-          actorItem()
         ],
       ),
     );
   }
 
-  Widget actorItem() {
+  Widget listCast(BuildContext context, List<Cast> cast){
+    final contentHeight = 5.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
     return Container(
-        margin: EdgeInsets.all(10),
+      margin: EdgeInsets.all(10),
+      child: SizedBox(
+            height: contentHeight,
+            child: ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return castItem(context, cast[index]);
+              },
+              scrollDirection: Axis.horizontal,
+              itemCount: cast.length,
+            ),
+          ),);
+  }
+
+  Widget castItem(BuildContext context, Cast cast) {
+    debugPrint(cast.profilePath);
+    return Container(
+        margin: EdgeInsets.only(left: 10),
         child: Row(
           children: [
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    image: NetworkImage(
-                        'https://googleflutter.com/sample_image.jpg'),
-                    fit: BoxFit.fill),
-              ),
+              child: CachedNetworkImage(
+                    errorWidget: (context, url, error) =>  Icon(Icons.error),
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    imageUrl: 'https://image.tmdb.org/t/p/original${cast.profilePath!}',
+                    fit: BoxFit.cover,
+                    
+                  ),
             ),
             Container(
               margin: EdgeInsets.all(10),
@@ -183,11 +225,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Actor',
+                    cast.name!,
                     style: Styles.textSubtitleBold,
                   ),
                   Text(
-                    'rol',
+                    cast.character!,
                     style: Styles.textSubtitleGray,
                   )
                 ],

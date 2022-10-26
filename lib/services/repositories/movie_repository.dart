@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 abstract class MovieRepository {
   Future<Movie> getDetails(String idMovie);
 
-  Future <Cast> getCast(String idMovie);
+  Future <List<Cast>> getCast(String idMovie);
 
   Future <List<MovieItem>> getPopularMovies(String page);
 }

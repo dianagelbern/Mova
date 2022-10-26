@@ -32,24 +32,24 @@ class Cast {
     required this.name,
     required this.originalName,
     required this.popularity,
-     this.profilePath,
+    required this.profilePath,
     required this.castId,
     required this.character,
     required this.creditId,
     required this.order,
   });
-  late final bool adult;
-  late final int gender;
-  late final int id;
-  late final String knownForDepartment;
-  late final String name;
-  late final String originalName;
-  late final double popularity;
+  late final bool? adult;
+  late final int? gender;
+  late final int? id;
+  late final String? knownForDepartment;
+  late final String? name;
+  late final String? originalName;
+  late final double? popularity;
   late final String? profilePath;
-  late final int castId;
-  late final String character;
-  late final String creditId;
-  late final int order;
+  late final int? castId;
+  late final String? character;
+  late final String? creditId;
+  late final int? order;
   
   Cast.fromJson(Map<String, dynamic> json){
     adult = json['adult'];
@@ -59,7 +59,7 @@ class Cast {
     name = json['name'];
     originalName = json['original_name'];
     popularity = json['popularity'];
-    profilePath = json['profilePath'];
+    profilePath = json['profile_path'] ?? 'https://t4.ftcdn.net/jpg/02/23/50/73/360_F_223507349_F5RFU3kL6eMt5LijOaMbWLeHUTv165CB.webp';
     castId = json['cast_id'];
     character = json['character'];
     creditId = json['credit_id'];

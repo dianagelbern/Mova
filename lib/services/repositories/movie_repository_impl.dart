@@ -20,11 +20,13 @@ class MovieRepositoryImpl extends MovieRepository{
   }
   
   @override
-  Future <Cast> getCast(String idMovie) async {
+  Future <List<Cast>> getCast(String idMovie) async {
     String uri = Routes.getCastOfMovie(idMovie);
     final response = await http.get(Uri.parse(uri));
     if(response.statusCode == 200){
-      return Cast.fromJson(jsonDecode(response.body));
+      
+      return Credits.fromJson(jsonDecode(response.body)).cast;
+      
     }else{
       throw Exception('Fail to load');
     }

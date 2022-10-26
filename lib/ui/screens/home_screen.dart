@@ -172,8 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(),
                     ),
-                    imageUrl: 'https://image.tmdb.org/t/p/original' +
-                        movie.posterPath!,
+                    imageUrl: 'https://image.tmdb.org/t/p/original${movie.posterPath!}',
                     fit: BoxFit.cover,
                     
                   ),
