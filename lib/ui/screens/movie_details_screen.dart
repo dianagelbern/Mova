@@ -11,15 +11,15 @@ import 'package:mova/ui/styles.dart';
 import '../../services/bloc/movie_item/movie_item_bloc.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
-  const MovieDetailsScreen({Key? key}) : super(key: key);
+  MovieDetailsScreen({Key? key, required this.id}) : super(key: key);
 
+  String id;
   @override
   State<MovieDetailsScreen> createState() => _MovieDetailsScreenState();
 }
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   late MovieRepository movie_repository;
-
 
   @override
   void initState() {
@@ -29,14 +29,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (context){
-      return MovieItemBloc(movie_repository)..add(MovieItemFetchEvent('2'));
-    }, 
-    child: _createMovieView(context),);
+    return BlocProvider(
+      create: (context) {
+        return MovieItemBloc(movie_repository)
+          ..add(MovieItemFetchEvent(widget.id));
+      },
+      child: _createMovieView(context),
+    );
   }
 
-
-   Widget _createMovieView(BuildContext context) {
+  Widget _createMovieView(BuildContext context) {
     return BlocBuilder<MovieItemBloc, MovieItemState>(
         builder: (context, state) {
       if (state is MovieItemInitial) {
@@ -47,11 +49,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         return Text('Fail to load');
       } else if (state is MovieItemfetchedState) {
         return Scaffold(
-      body: SingleChildScrollView(
-          child: Column(
-        children: [header( context, state.movie), body(context, state.movie)],
-      )),
-    );
+          body: SingleChildScrollView(
+              child: Column(
+            children: [
+              header(context, state.movie),
+              body(context, state.movie)
+            ],
+          )),
+        );
       } else {
         return Text('Not support');
       }
@@ -59,13 +64,31 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Widget header(BuildContext context, Movie movie) {
-    return Container(
-      height: 280,
-      width: MediaQuery.of(context).size.width,
-      child: Image.network(
-        'https://image.tmdb.org/t/p/original' + movie.posterPath!,
-        fit: BoxFit.fitWidth,
-      ),
+    return Stack(
+      children: [
+        Container(
+          height: 380,
+          width: MediaQuery.of(context).size.width,
+          child: Image.network(
+            'https://image.tmdb.org/t/p/original' + movie.posterPath!,
+            fit: BoxFit.fitWidth,
+            alignment: Alignment.topCenter,
+          ),
+        ),
+        Container(
+          alignment: Alignment.centerLeft,
+          margin: const EdgeInsets.only(top: 40),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ],
     );
   }
 

@@ -17,10 +17,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF181A20),
       ),
-      initialRoute: '/details',
+      initialRoute: '/home',
       routes: {
         '/home': (context) => const HomeScreen(),
-        '/details': (context) => const MovieDetailsScreen()
       },
     );
   }
