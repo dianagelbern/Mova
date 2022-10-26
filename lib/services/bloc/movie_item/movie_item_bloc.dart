@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mova/models/Movie.dart';
-import 'package:mova/services/repositories/movies_repository.dart';
+import 'package:mova/services/repositories/movie_repository.dart';
 
 part 'movie_item_event.dart';
 part 'movie_item_state.dart';

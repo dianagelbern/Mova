@@ -26,36 +26,36 @@ class Movie {
     required this.voteAverage,
     required this.voteCount,
   });
-  late final bool adult;
-  late final String backdropPath;
-  late final Null belongsToCollection;
-  late final int budget;
+  late final bool? adult;
+  late final String? backdropPath;
+  late final String? belongsToCollection;
+  late final int? budget;
   late final List<Genres> genres;
-  late final String homepage;
-  late final int id;
-  late final String imdbId;
-  late final String originalLanguage;
-  late final String originalTitle;
-  late final String overview;
-  late final double popularity;
-  late final String posterPath;
+  late final String? homepage;
+  late final int? id;
+  late final String? imdbId;
+  late final String? originalLanguage;
+  late final String? originalTitle;
+  late final String? overview;
+  late final double? popularity;
+  late final String? posterPath;
   late final List<ProductionCompanies> productionCompanies;
   late final List<ProductionCountries> productionCountries;
-  late final String releaseDate;
-  late final int revenue;
-  late final int runtime;
+  late final String? releaseDate;
+  late final int? revenue;
+  late final int? runtime;
   late final List<SpokenLanguages> spokenLanguages;
-  late final String status;
-  late final String tagline;
-  late final String title;
-  late final bool video;
-  late final double voteAverage;
-  late final int voteCount;
+  late final String? status;
+  late final String? tagline;
+  late final String? title;
+  late final bool? video;
+  late final double? voteAverage;
+  late final int? voteCount;
   
   Movie.fromJson(Map<String, dynamic> json){
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    belongsToCollection = null;
+    belongsToCollection = json['belongsToCollection'];
     budget = json['budget'];
     genres = List.from(json['genres']).map((e)=>Genres.fromJson(e)).toList();
     homepage = json['homepage'];
@@ -140,7 +140,7 @@ class ProductionCompanies {
     required this.originCountry,
   });
   late final int id;
-  late final String logoPath;
+  late final String? logoPath;
   late final String name;
   late final String originCountry;
   
