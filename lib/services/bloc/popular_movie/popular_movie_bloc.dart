@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mova/models/MoviesResponse.dart';
+import 'package:mova/models/moviesResponse.dart';
 import 'package:mova/services/bloc/movie_item/movie_item_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 

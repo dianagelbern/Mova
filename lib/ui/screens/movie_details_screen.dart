@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mova/models/Credits.dart';
-import 'package:mova/models/Movie.dart';
-import 'package:mova/models/MoviesResponse.dart';
+import 'package:mova/models/credits.dart';
+import 'package:mova/models/movie.dart';
+import 'package:mova/models/moviesResponse.dart';
 import 'package:mova/services/bloc/credits/credits_bloc.dart';
+import 'package:mova/services/bloc/trailer/trailer_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 import 'package:mova/services/repositories/movie_repository_impl.dart';
 import 'package:mova/ui/styles.dart';
+import 'package:mova/ui/widgets/video_player.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../services/bloc/movie_item/movie_item_bloc.dart';
 
@@ -30,37 +33,58 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     movie_repository = MovieRepositoryImpl();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(providers: [
-      BlocProvider(
-        create: (context) {
-          return MovieItemBloc(movie_repository)
-            ..add(MovieItemFetchEvent(widget.id));
-        },
-      ),
-      BlocProvider(
-        create: (context) {
-          return CreditsBloc(movie_repository)
-            ..add(CreditsItemFetchEvent(widget.id));
-        },
-      )
-    ], child: Scaffold(body: SingleChildScrollView(child: Column(children: [_createMovieView(context), _createCastView(context)],),),));
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) {
+              return MovieItemBloc(movie_repository)
+                ..add(MovieItemFetchEvent(widget.id));
+            },
+          ),
+          BlocProvider(
+            create: (context) {
+              return CreditsBloc(movie_repository)
+                ..add(CreditsItemFetchEvent(widget.id));
+            },
+          ),
+          
+          BlocProvider(create: (context) {
+            return TrailerBloc(movie_repository)
+              ..add(TrailerFetchEvent(widget.id));
+          })
+          
+        ],
+        child: Scaffold(
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                _createMovieView(context),
+                _createCastView(context),
+                //_trailer()
+                _movieTrailer(context)
+              ],
+            ),
+          ),
+        ));
   }
 
-  Widget _createCastView (BuildContext context){
-    return BlocBuilder<CreditsBloc, CreditsState>(builder: (context, state){
-      if(state is CreditsInitial){
+  Widget _createCastView(BuildContext context) {
+    return BlocBuilder<CreditsBloc, CreditsState>(builder: (context, state) {
+      if (state is CreditsInitial) {
         return const Center(
           child: CircularProgressIndicator.adaptive(),
         );
-      }else if (state is CreditsItemFetchedError){
+      } else if (state is CreditsItemFetchedError) {
         return Text('Fail to load');
-      }else if (state is CreditsItemFetchedState){
+      } else if (state is CreditsItemFetchedState) {
         return listCast(context, state.castList);
-      }else{
-        return Text('Not support');
+      } else {
+        return Text(
+          'Not support',
+          style: Styles.textSubtitle,
+        );
       }
     });
   }
@@ -76,16 +100,57 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         return Text('Fail to load');
       } else if (state is MovieItemfetchedState) {
         return Column(
-            children: [
-              header(context, state.movie),
-              body(context, state.movie)
-            ],
-          );
+          children: [header(context, state.movie), body(context, state.movie)],
+        );
       } else {
-        return Text('Not support');
+        return Text(
+          'Not support',
+          style: Styles.textSubtitle,
+        );
       }
     });
   }
+
+  Widget _trailer() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            child: Text('Trailer', style: Styles.texttitleRed),),
+          Container(
+            height: 230,
+            child: VideoPlayerItem(
+              VideoPlayerItemController: VideoPlayerController.network(
+                'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4',
+              ),
+              looping: false,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  
+  Widget _movieTrailer(BuildContext context) {
+    return BlocBuilder<TrailerBloc, TrailerState>(builder: (context, state) {
+      if (state is TrailerInitial) {
+        return const Center(
+          child: CircularProgressIndicator.adaptive(),
+        );
+      } else if (state is TrailerFetchedError) {
+        return Text('Fail to load');
+      } else if (state is TrailerFetchedState) {
+        return _trailer();
+      } else {
+        return Text('Not support', style: Styles.textSubtitle,);
+      }
+    });
+  }
+  
 
   Widget header(BuildContext context, Movie movie) {
     return Stack(
@@ -182,19 +247,20 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     );
   }
 
-  Widget listCast(BuildContext context, List<Cast> cast){
+  Widget listCast(BuildContext context, List<Cast> cast) {
     return Container(
       margin: EdgeInsets.all(10),
       child: SizedBox(
-            height: 50,
-            child: ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                return castItem(context, cast[index]);
-              },
-              scrollDirection: Axis.horizontal,
-              itemCount: cast.length,
-            ),
-          ),);
+        height: 50,
+        child: ListView.builder(
+          itemBuilder: (BuildContext context, int index) {
+            return castItem(context, cast[index]);
+          },
+          scrollDirection: Axis.horizontal,
+          itemCount: cast.length,
+        ),
+      ),
+    );
   }
 
   Widget castItem(BuildContext context, Cast cast) {
@@ -207,14 +273,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               width: 40,
               height: 40,
               child: CachedNetworkImage(
-                    errorWidget: (context, url, error) =>  Icon(Icons.error),
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    imageUrl: 'https://image.tmdb.org/t/p/original${cast.profilePath!}',
-                    fit: BoxFit.cover,
-                    
-                  ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                imageUrl:
+                    'https://image.tmdb.org/t/p/original${cast.profilePath!}',
+                fit: BoxFit.cover,
+              ),
             ),
             Container(
               margin: EdgeInsets.all(10),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mova/models/Credits.dart';
+import 'package:mova/models/credits.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 
 part 'credits_event.dart';

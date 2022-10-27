@@ -11,7 +11,7 @@ class Styles {
   static const double textSizeMedium = 20.0;
   static const double textSizeSmall = 13.0;
   static const double textSizeMin = 10.25;
-  static const double textSizeTitle = 14.0;
+  static const double textSizeTitle = 15.0;
 
   static TextStyle get textTitle => GoogleFonts.getFont('Roboto',
           color: Styles.primaryColor,
@@ -37,4 +37,9 @@ class Styles {
       static TextStyle get textSubtitleRed => GoogleFonts.getFont('Roboto',
       color: Styles.secondaryColor,
       fontSize: textSizeSmall,);
+
+      static TextStyle get texttitleRed => GoogleFonts.getFont('Roboto',
+      color: Styles.secondaryColor,
+      fontWeight: FontWeight.w600,
+      fontSize: textSizeMedium,);
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mova/models/MoviesResponse.dart';
+import 'package:mova/models/moviesResponse.dart';
 import 'package:mova/services/bloc/now_playing_movie/now_playing_movie_bloc.dart';
 import 'package:mova/services/bloc/popular_movie/popular_movie_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Text('Fail to load');
         } else if (state is GetPopularMovie) {
           return Column(
-              children: [header(context, state.popularmovies), listMovieItem(context, state.popularmovies, 'Popular')],
+              children: [header(context, state.popularmovies), listMovieItem(context, state.popularmovies, 'Popular movies')],
             );
         } else {
           return const Text('Not support');
