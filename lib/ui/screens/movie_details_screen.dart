@@ -49,12 +49,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                 ..add(CreditsItemFetchEvent(widget.id));
             },
           ),
-          
           BlocProvider(create: (context) {
             return TrailerBloc(movie_repository)
               ..add(TrailerFetchEvent(widget.id));
           })
-          
         ],
         child: Scaffold(
           body: SingleChildScrollView(
@@ -119,12 +117,13 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         children: [
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
-            child: Text('Trailer', style: Styles.texttitleRed),),
+            child: Text('Trailer', style: Styles.texttitleRed),
+          ),
           Container(
             height: 230,
             child: VideoPlayerItem(
               VideoPlayerItemController: VideoPlayerController.network(
-                'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4',
+                'https://www.youtube.com/embed/NnjCUbIfKoM',
               ),
               looping: false,
             ),
@@ -134,7 +133,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     );
   }
 
-  
   Widget _movieTrailer(BuildContext context) {
     return BlocBuilder<TrailerBloc, TrailerState>(builder: (context, state) {
       if (state is TrailerInitial) {
@@ -146,11 +144,13 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       } else if (state is TrailerFetchedState) {
         return _trailer();
       } else {
-        return Text('Not support', style: Styles.textSubtitle,);
+        return Text(
+          'Not support',
+          style: Styles.textSubtitle,
+        );
       }
     });
   }
-  
 
   Widget header(BuildContext context, Movie movie) {
     return Stack(
