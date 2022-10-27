@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Text('Fail to load');
         } else if (state is GetPopularMovie) {
           return Column(
-              children: [header(), listMovieItem(context, state.popularmovies, 'Popular')],
+              children: [header(context, state.popularmovies), listMovieItem(context, state.popularmovies, 'Popular')],
             );
         } else {
           return const Text('Not support');
@@ -83,17 +83,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget header() {
+  Widget header(BuildContext context, List<MovieItem> movies) {
     return SizedBox(
       height: 400,
       //Stack for the background image
       child: Stack(children: [
         Container(
           width: MediaQuery.of(context).size.width,
-          child: Image.asset(
-            'assets/images/poster_template.jpg',
-            fit: BoxFit.fitWidth,
-          ),
+          child: CachedNetworkImage(
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    imageUrl: 'https://image.tmdb.org/t/p/original${movies.elementAt(0).posterPath!}',
+                    fit: BoxFit.cover,
+                  ),
         ),
         Container(
           width: 800,
@@ -110,13 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dr. Strange 2',
+                  movies.elementAt(0).title.toString(),
                   style: Styles.textTitle,
                 ),
-                FittedBox(
-                  fit: BoxFit.contain,
+                Container(
+                  
+                  width: 300,
                   child: Text(
-                    'Action, Super Hero ',
+                    movies.elementAt(0).overview.toString(),
                     style: Styles.textRegular,
                     overflow: TextOverflow.ellipsis,
                   ),

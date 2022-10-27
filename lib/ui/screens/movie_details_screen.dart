@@ -124,7 +124,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            movie.originalTitle!,
+            movie.title!,
             style: Styles.textTitle,
           ),
           Row(
