@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mova/models/PopularMovie.dart';
+import 'package:mova/models/MoviesResponse.dart';
+import 'package:mova/services/bloc/now_playing_movie/now_playing_movie_bloc.dart';
 import 'package:mova/services/bloc/popular_movie/popular_movie_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 import 'package:mova/services/repositories/movie_repository_impl.dart';
@@ -28,18 +29,27 @@ class _HomeScreenState extends State<HomeScreen> {
     movieRepository = MovieRepositoryImpl();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return MultiBlocProvider(providers: [
+      BlocProvider(
       create: (context) {
         return PopularMovieBloc(movieRepository)
           ..add(GetPopularMovieWithType(page));
-      },
-      child: _createMovies(context),
-    );
+      }
+    ),
+    BlocProvider(
+      create: (context) {
+        return NowPlayingMovieBloc(movieRepository)
+          ..add(GetNowPlayingWithType(page));
+      }
+    )
+
+    ], child: Scaffold(body: SingleChildScrollView(child: Column(children: [_getPopularMovies(context), _getNowPlayingMovies(context)],),),));
   }
 
-  Widget _createMovies(BuildContext context) {
+  Widget _getPopularMovies(BuildContext context) {
     return BlocBuilder<PopularMovieBloc, PopularMovieState>(
       builder: (context, state) {
         if (state is PopularMovieInitial) {
@@ -47,13 +57,25 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (state is PopularMovieError) {
           return Text('Fail to load');
         } else if (state is GetPopularMovie) {
-          return Scaffold(
-              body: SingleChildScrollView(
-            child: Container(
-                child: Column(
-              children: [header(), listMovieItem(context, state.popularmovies)],
-            )),
-          ));
+          return Column(
+              children: [header(), listMovieItem(context, state.popularmovies, 'Popular')],
+            );
+        } else {
+          return const Text('Not support');
+        }
+      },
+    );
+  }
+
+  Widget _getNowPlayingMovies(BuildContext context) {
+    return BlocBuilder<NowPlayingMovieBloc, NowPlayingMovieState>(
+      builder: (context, state) {
+        if (state is NowPlayingMovieInitial) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is NowPlayingMovieError) {
+          return Text('Fail to load');
+        } else if (state is GetNowPlayingMovie) {
+          return listMovieItem(context, state.nowMovies, 'Now Playing');
         } else {
           return const Text('Not support');
         }
@@ -107,10 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget listMovieItem(BuildContext context, List<MovieItem> movies) {
-    final contentHeight = 5.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
+  Widget listMovieItem(BuildContext context, List<MovieItem> movies, String category) {
     return Container(
-      margin: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+      margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20),
       child: Column(
         children: [
           Container(
@@ -119,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Popular Movies',
+                  category,
                   style: Styles.textTitle,
                 ),
                 Container(
@@ -133,10 +154,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SizedBox(
-            height: contentHeight,
+            height: 200,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
-                return _createPopularViewItem(context, movies[index]);
+                return _createMovieViewItem(context, movies[index]);
               },
               scrollDirection: Axis.horizontal,
               itemCount: movies.length,
@@ -147,10 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _createPopularViewItem(BuildContext context, MovieItem movie) {
-    final width = MediaQuery.of(context).size.width / 2.6;
+  Widget _createMovieViewItem(BuildContext context, MovieItem movie) {
+    
     return InkWell(
         onTap: () {
+          
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -174,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     imageUrl: 'https://image.tmdb.org/t/p/original${movie.posterPath!}',
                     fit: BoxFit.cover,
-                    
+                    width: 150,
                   ),
                   Container(
                     alignment: Alignment.center,
@@ -183,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 20,
                     color: Colors.red,
                     child: Text(movie.voteAverage.toString(),
-                        style: TextStyle(color: Colors.white, fontSize: 12)),
+                        style: Styles.textSubtitle),
                   )
                 ],
               ),

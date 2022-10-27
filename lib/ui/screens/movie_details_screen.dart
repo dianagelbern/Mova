@@ -5,7 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mova/models/Credits.dart';
 import 'package:mova/models/Movie.dart';
-import 'package:mova/models/PopularMovie.dart';
+import 'package:mova/models/MoviesResponse.dart';
 import 'package:mova/services/bloc/credits/credits_bloc.dart';
 import 'package:mova/services/repositories/movie_repository.dart';
 import 'package:mova/services/repositories/movie_repository_impl.dart';
@@ -149,7 +149,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       size: 25,
                     ),
                     Text(
-                      movie.genres.elementAt(0).name,
+                      movie.releaseDate.toString(),
                       style: Styles.textSubtitle,
                     ),
                   ],
@@ -183,11 +183,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Widget listCast(BuildContext context, List<Cast> cast){
-    final contentHeight = 5.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
     return Container(
       margin: EdgeInsets.all(10),
       child: SizedBox(
-            height: contentHeight,
+            height: 50,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return castItem(context, cast[index]);

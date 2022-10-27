@@ -1,19 +1,16 @@
-class NowPlayingMovie {
-  NowPlayingMovie({
-    required this.dates,
+class MoviesResponse {
+  MoviesResponse({
     required this.page,
     required this.results,
     required this.totalPages,
     required this.totalResults,
   });
-  late final Dates dates;
   late final int page;
   late final List<MovieItem> results;
   late final int totalPages;
   late final int totalResults;
   
-  NowPlayingMovie.fromJson(Map<String, dynamic> json){
-    dates = Dates.fromJson(json['dates']);
+  MoviesResponse.fromJson(Map<String, dynamic> json){
     page = json['page'];
     results = List.from(json['results']).map((e)=>MovieItem.fromJson(e)).toList();
     totalPages = json['total_pages'];
@@ -22,32 +19,10 @@ class NowPlayingMovie {
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
-    _data['dates'] = dates.toJson();
     _data['page'] = page;
     _data['results'] = results.map((e)=>e.toJson()).toList();
     _data['total_pages'] = totalPages;
     _data['total_results'] = totalResults;
-    return _data;
-  }
-}
-
-class Dates {
-  Dates({
-    required this.maximum,
-    required this.minimum,
-  });
-  late final String maximum;
-  late final String minimum;
-  
-  Dates.fromJson(Map<String, dynamic> json){
-    maximum = json['maximum'];
-    minimum = json['minimum'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['maximum'] = maximum;
-    _data['minimum'] = minimum;
     return _data;
   }
 }
@@ -69,20 +44,20 @@ class MovieItem {
     required this.voteAverage,
     required this.voteCount,
   });
-  late final bool adult;
-  late final String backdropPath;
+  late final bool? adult;
+  late final String? backdropPath;
   late final List<int> genreIds;
-  late final int id;
-  late final String originalLanguage;
-  late final String originalTitle;
-  late final String overview;
-  late final double popularity;
-  late final String posterPath;
-  late final String releaseDate;
-  late final String title;
-  late final bool video;
-  late final double? voteAverage;
-  late final int voteCount;
+  late final int? id;
+  late final String? originalLanguage;
+  late final String? originalTitle;
+  late final String? overview;
+  late final double? popularity;
+  late final String? posterPath;
+  late final String? releaseDate;
+  late final String? title;
+  late final bool? video;
+  late final num? voteAverage;
+  late final int? voteCount;
   
   MovieItem.fromJson(Map<String, dynamic> json){
     adult = json['adult'];
